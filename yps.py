@@ -16,17 +16,12 @@ pg_passwd = environ['PGPSSWD']
 
 connection_string = "postgresql://{}:{}@localhost:5432/cp_scrape".format(pg_uname, pg_passwd)
 
-#db = dataset.connect("postgresql://josephkokenge:OtEDGCRaR!1gbr@localhost:5432/cp_scrape")
-db = dataset.connect("connection_string")
+db = dataset.connect(connection_string)
 
-##get the cities from here
-##http://www.biggestuscities.com/20
-
-#http://www.yellowpages.com/search?search_terms=plumber&geo_location_terms=San%20Antonio%2C%20TX&page=1
 BASEURL = 'http://www.yellowpages.com/search?search_terms='
-search_terms = 'engineers'
+search_terms = 'dentists'
 geo_location_url = "&geo_location_terms="
-geo_location_terms = "San Antonio"
+geo_location_terms = "austin, tx"
 page = "&page="
 
 def url_to_filename(url):
@@ -113,20 +108,19 @@ def html_processor(html_divs):
             'biz_name': biz_name,
             'listing_id': listingID,
             'yellow_page_id': ypid,
-            'streetAddress': streetAddress, 
+            'streetaddress': streetAddress, 
             'address_locality' : addressLocality, 
-            'addressRegion' :  addressRegion, 
-            'postalCode' : postalCode,
+            'addressregion' :  addressRegion, 
+            'postalcode' : postalCode,
             'phone_num' : phone,
             'website_url' : site_url,
-            'websiteIsYp' :  websiteIsYp,
+            'websiteisyp' :  websiteIsYp,
             'isad': ypad,
             'biz_type': search_terms,
             'key' : key
 
         }
-
-        db['yellowpages'].upsert(data, ['key'])
+        db['yellowpages_austintx'].upsert(data, ['key'])
 
 def scrape_content(content):
     soup = BeautifulSoup(content, "html.parser")
@@ -139,7 +133,7 @@ def scrape_content(content):
 def iterate_page():
     counter = 1
 
-    while (counter < 23):
+    while (counter < 75):
         url = BASEURL + search_terms + geo_location_url + geo_location_terms + page + "%d" % counter
         print("On url: %s " % url)
         content = get_content(url)
